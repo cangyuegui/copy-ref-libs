@@ -6,7 +6,7 @@
 
 std::string do_exec(const std::string& cmd)
 {
-    std::array<char, 128> buffer;
+    std::array<char, 256> buffer;
     std::string result;
     auto pipe = popen(cmd.c_str(), "r");
     if (!pipe) {
@@ -100,9 +100,8 @@ int main(int argc, char *argv[])
         {
             ldd_cmd = std::string("ldd \"") + str + "\"";
             ldd_res = do_exec(ldd_cmd);
-            std::set<std::string> rstrs = get_refs(ldd_res);
 
-            std::cout << ldd_cmd << std::endl;
+            std::set<std::string> rstrs = get_refs(ldd_res);
 
             for (auto sub : rstrs)
             {
@@ -118,14 +117,15 @@ int main(int argc, char *argv[])
             break;
 
         crefs = trefs;
+        trefs.clear();
     }
 
     for (auto str : refs)
     {
         std::string dst_file = dir_path + "/" + get_file_name(str);
         std::string cp_cmd = std::string("cp -f \"") + str + "\" \"" + dst_file + "\"";
-        system(cp_cmd.c_str());
         std::cout << str  << " " << "->" << dst_file << std::endl;
+        system(cp_cmd.c_str());
     }
 
     return 0;
